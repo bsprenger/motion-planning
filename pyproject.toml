@@ -16,6 +16,7 @@ mink = "^0.0.10"
 robosuite-models = "^1.0.0"
 opencv-python = "^4.11.0"
 jupyter = "^1.1.1"
+h5py = "^3.13.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
