@@ -6,6 +6,25 @@ import numpy as np
 COLORS = Literal["red", "green", "blue"]
 
 
+def mujoco_image_to_opencv_image(image: np.ndarray) -> np.ndarray:
+    """
+    Convert a MuJoCo RGB image to OpenCV BGR format.
+
+    Args:
+        image: The input RGB image as a NumPy array.
+
+    Returns:
+        The converted BGR image as a NumPy array.
+    """
+    # Flip the image vertically
+    flipped_image = image[::-1, :, :]
+
+    # Convert RGB to BGR
+    bgr_image = cv2.cvtColor(flipped_image, cv2.COLOR_RGB2BGR)
+
+    return bgr_image
+
+
 def create_color_mask(image: np.ndarray, color: COLORS) -> np.ndarray | None:
     """
     Args:
