@@ -21,8 +21,8 @@ class Simulator:
         sim = suite.make(env_name="UltraTask")
         return sim
 
-    def reset(self) -> None:
-        self.env.reset()
+    def reset(self) -> dict[str, Any]:
+        return self.env.reset()
 
     def step(self, action):
         obs, _, _, _ = self.env.step(action)
