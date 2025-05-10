@@ -1,20 +1,23 @@
-from motion_planning.environment import UltraTask
+from typing import Any
+
 import numpy as np
 import robosuite as suite
-from typing import Any
+from robosuite.utils.camera_utils import get_camera_intrinsic_matrix
 from robosuite.utils.mjcf_utils import xml_path_completion
 import math
 
 IMAGE_HEIGHT = 256
 IMAGE_WIDTH = 256
 
-class Simulator:
+from motion_planning.environment import UltraTask
 
+
+class Simulator:
     def __init__(self) -> None:
-        self.env = self._make_env()
+        self.env: UltraTask = self._make_env()
 
     @staticmethod
-    def _make_env() -> Any:
+    def _make_env() -> UltraTask:
         sim = suite.make(env_name="UltraTask")
         return sim
 
