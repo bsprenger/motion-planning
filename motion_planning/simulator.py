@@ -44,7 +44,20 @@ class Simulator:
 
     def get_camera_transform(self) -> tuple[np.ndarray, np.ndarray]:
         camera_id = self.env.sim.model.camera_name2id("frontview")
-        return self.env.sim.data.cam_xpos[camera_id], self.env.sim.data.cam_xmat[camera_id].reshape(3, 3)
+        return self.env.sim.data.cam_xpos[camera_id], self.env.sim.data.cam_xmat[
+            camera_id
+        ].reshape(3, 3)
+
+    def get_camera_intrinsics(self) -> np.ndarray:
+        camera_id = self.env.sim.model.camera_name2id("frontview")
+        width = self.env.camera_widths[camera_id]
+        height = self.env.camera_heights[camera_id]
+        return get_camera_intrinsic_matrix(
+            self.env.sim,
+            camera_name="frontview",
+            camera_width=width,
+            camera_height=height,
+        )
 
     def get_camera_intrinsics(self) -> tuple[np.ndarray, np.ndarray]:
         camera_id = self.env.sim.model.camera_name2id("frontview")
@@ -55,5 +68,3 @@ class Simulator:
 
     def get_robot_mjcf_path(self) -> str:
         return xml_path_completion("robots/panda/robot.xml")
-
-    
