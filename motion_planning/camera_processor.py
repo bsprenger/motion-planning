@@ -1,3 +1,11 @@
+"""
+Sources:
+- https://en.wikipedia.org/wiki/Camera_matrix
+- https://staff.fnwi.uva.nl/r.vandenboomgaard/IPCV20162017/LectureNotes/CV/PinholeCamera/PinholeCamera.html
+- https://ksimek.github.io/2013/08/13/intrinsic/
+- https://mujoco.readthedocs.io/en/3.0.1/modeling.html#cameras for coordinate system
+"""
+
 from typing import Literal
 
 import cv2
