@@ -6,6 +6,8 @@ from motion_planning.task_executor import TaskExecutor
 from motion_planning.trajectory_controller import TrajectoryController
 from motion_planning.utils import get_stacking_order_from_user
 
+OBJECT_HEIGHT = 0.05  # Height of the blocks (meters)
+
 if __name__ == "__main__":
     sim = Simulator()
     obs = sim.reset()
@@ -37,18 +39,9 @@ if __name__ == "__main__":
     base_pos = camera_processor.get_block_position_from_color(obs, stack_order[0])
     print(f"Base position: {base_pos}")
 
-    for i in range(1000):
-        # Set the desired 6DOF position of the end effector + gripper position
-        action = np.random.randn(*sim.action_spec[0].shape) * 0.1
-        observation = sim.step(action)
-
-        if i == 0:
-            print("-- Observation --")
-            for k, v in observation.items():
-                print(f"{k}: Shape [{v.shape}], Type [{v.dtype}]")
-            print("-- Action --")
-            action_min, action_max = sim.action_spec
-            print(
-                f"Action: Shape [{action.shape}], Type [{action.dtype}], Min [{action_min}], Max [{action_max}]"
-            )
-        sim.render()
+    for i, color in enumerate(stack_order[1:]):
+        # Get the position of the block we want to pick
+        pick_pos = camera_processor.get_block_position_from_color(obs, color)
+        target_pos = base_pos.copy()
+        target_pos[2] += OBJECT_HEIGHT * (i + 1)  # Stack height
+        print(f"Moving {color.upper()} to {target_pos} from {pick_pos}")
