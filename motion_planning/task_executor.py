@@ -107,7 +107,7 @@ class TaskExecutor:
                 - success (bool): True if the reset pose was reached, False otherwise.
         """
         reset_waypoint = {
-            "target_pos_abs": np.array([0.0, 0.0, 1.0]),
+            "target_pos_abs": np.array([0.0, 0.0, 0.90]),
             "target_orientation_rpy": np.array([math.pi, 0.0, 0.0]),
             "target_gripper_cmd": -1.0,
             "label": "Reset Robot Pose to Home",
