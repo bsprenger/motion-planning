@@ -1,11 +1,13 @@
 import numpy as np
 
 from motion_planning.simulator import Simulator
+from motion_planning.utils import get_stacking_order_from_user
 
 if __name__ == "__main__":
     sim = Simulator()
-
     sim.reset()
+
+    stack_order = get_stacking_order_from_user()
 
     # 6DOF position and intrinsics of the camera
     camera_translation, camera_rotation = sim.get_camera_transform()
