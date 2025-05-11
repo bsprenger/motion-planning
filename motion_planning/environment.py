@@ -13,33 +13,34 @@ from robosuite.utils.transform_utils import convert_quat
 
 
 
-CONTROLLER_CONFIG = {
-    "type": "BASIC",
-    "body_parts": {
-        "right": {
-            "type": "JOINT_POSITION",
-            "input_max": 3.14,
-            "input_min": -3.14,
-            "output_max": 3.14,
-            "output_min": -3.14,
-            "kp": 150,
-            "damping_ratio": 1,
-            "impedance_mode": "fixed",
-            "kp_limits": [0, 300],
-            "damping_ratio_limits": [0, 10],
-            "position_limits": None,
-            "orientation_limits": None,
-            "uncouple_pos_ori": True,
-            "input_type": "delta",
-            "input_ref_frame": "base",
-            "interpolation": None,
-            "ramp_ratio": 0.2,
-            "gripper": {
-                "type": "GRIP"
-            }
-        }
-    }
-}
+# CONTROLLER_CONFIG = {
+#     "type": "BASIC",
+#     "body_parts": {
+#         "right": {
+#             "type": "JOINT_POSITION",
+#             "input_max": 3.14,
+#             "input_min": -3.14,
+#             "output_max": 3.14,
+#             "output_min": -3.14,
+#             "kp": 150,
+#             "damping_ratio": 1,
+#             "impedance_mode": "fixed",
+#             "kp_limits": [0, 300],
+#             "damping_ratio_limits": [0, 10],
+#             "position_limits": None,
+#             "orientation_limits": None,
+#             "uncouple_pos_ori": True,
+#             "input_type": "delta",
+#             "input_ref_frame": "base",
+#             "interpolation": None,
+#             "ramp_ratio": 0.2,
+#             "gripper": {
+#                 "type": "GRIP"
+#             }
+#         }
+#     }
+# }
+CONTROLLER_CONFIG = None
 
 class UltraTask(ManipulationEnv):
     """
