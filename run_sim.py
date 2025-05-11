@@ -1,5 +1,3 @@
-import numpy as np
-
 from motion_planning.camera_processor import CameraProcessor
 from motion_planning.simulator import Simulator
 from motion_planning.task_executor import TaskExecutor
@@ -43,5 +41,15 @@ if __name__ == "__main__":
         # Get the position of the block we want to pick
         pick_pos = camera_processor.get_block_position_from_color(obs, color)
         target_pos = base_pos.copy()
+
+        # Since we know the block size and we know the stacking is relatively
+        # reliable we can just use the base position and add the height of the
+        # block times the index of the block we are stacking
         target_pos[2] += OBJECT_HEIGHT * (i + 1)  # Stack height
         print(f"Moving {color.upper()} to {target_pos} from {pick_pos}")
+
+        task_executor.perform_pick_and_place(
+            initial_obs=obs,
+            pick_location=pick_pos,
+            target_location=target_pos,
+        )

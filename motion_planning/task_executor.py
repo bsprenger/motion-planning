@@ -4,11 +4,12 @@ import numpy as np
 
 from motion_planning.simulator import Simulator
 from motion_planning.trajectory_controller import TrajectoryController
+from motion_planning.waypoint_planner import WaypointPlanner
 
 
 class TaskExecutor:
     """
-    Executes a sequence of waypoints using a TrajectoryController.
+    Executes a sequence of waypoints and higher-level tasks like pick and place.
     """
 
     def __init__(
@@ -32,6 +33,7 @@ class TaskExecutor:
         self.controller = controller
         self.position_tolerance = position_tolerance
         self.orientation_tolerance = orientation_tolerance
+        self.waypoint_planner = WaypointPlanner()
 
     def _check_pose_reached(
         self,
@@ -122,8 +124,8 @@ class TaskExecutor:
         self,
         waypoints: list[dict],
         initial_obs: dict,
-        max_steps_per_waypoint: int = 100,
-        gripper_action_steps: int = 10,
+        max_steps_per_waypoint: int = 200,
+        gripper_action_steps: int = 20,
     ) -> tuple[dict, bool]:
         """
         Executes a given sequence of waypoints.
@@ -227,3 +229,66 @@ class TaskExecutor:
             print("\nWaypoint sequence execution completed with warnings or failures.")
 
         return current_obs, overall_success
+
+    def perform_pick_and_place(
+        self,
+        initial_obs: dict,
+        pick_location: np.ndarray,
+        target_location: np.ndarray,
+        pick_approach_offset: float = 0.1,
+        object_release_clearance: float = 0.02,
+    ) -> dict:
+        """
+        Performs a single pick and place operation.
+
+        Args:
+            initial_obs: The initial observation dictionary from the simulator.
+            pick_location: The 3D coordinate for grasping the object.
+            target_location: The 3D coordinate for placing the object.
+            pick_approach_offset: Height offset for the approach to the pick location.
+            object_release_clearance: Clearance height for the end-effector at release.
+
+        Returns:
+            The final observation dictionary after the place operation.
+        """
+        obs = initial_obs
+
+        # 1. Plan and execute PICK trajectory (ends with gripper closed at pick_location)
+        print(f"Starting PICK operation from: {pick_location}")
+        pick_waypoints = self.waypoint_planner.plan_pick_trajectory(
+            current_location=obs["robot0_eef_pos"],
+            pick_location=pick_location,
+            height_offset=pick_approach_offset,
+        )
+        obs, _ = self.execute_waypoint_sequence(
+            waypoints=pick_waypoints,
+            initial_obs=obs,
+        )
+        print(f"Pick (grasp) completed. Current EEF pos: {obs['robot0_eef_pos']}")
+
+        # 2. Plan and execute PLACE trajectory (approaches, moves to release, opens gripper)
+        # target_location[2] now contains the Z for the base of the object being placed.
+        # object_release_clearance is added to this for the gripper's release height.
+        actual_release_location = np.array(
+            [
+                target_location[0],
+                target_location[1],
+                target_location[2] + object_release_clearance,
+            ]
+        )
+
+        print(
+            f"Starting PLACE operation. Current pos: {obs['robot0_eef_pos']}, Release at: {actual_release_location}"
+        )
+        place_waypoints = self.waypoint_planner.plan_place_trajectory(
+            current_location=obs["robot0_eef_pos"],
+            release_location=actual_release_location,
+            height_offset=0,  # Height offset for place is handled by actual_release_location
+        )
+        obs, _ = self.execute_waypoint_sequence(
+            waypoints=place_waypoints,
+            initial_obs=obs,
+        )
+        print(f"Place (release) completed. Current EEF pos: {obs['robot0_eef_pos']}")
+
+        return obs
