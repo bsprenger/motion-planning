@@ -1,4 +1,6 @@
-VALID_COLOR_CHARS = {"r", "g", "b"}
+from typing import Literal, get_args
+
+VALID_COLOR_CHARS = Literal["r", "g", "b"]
 
 
 def get_stacking_order_from_user() -> list[str]:
@@ -16,9 +18,9 @@ def get_stacking_order_from_user() -> list[str]:
     """
     while True:
         user_input = input(
-            f"Enter the order of blocks (e.g., 'rgb', using {sorted(list(VALID_COLOR_CHARS))}): "
+            f"Enter the order of blocks (e.g., 'rgb', using {sorted(get_args(VALID_COLOR_CHARS))}): "
         ).lower()
-        if len(user_input) == 3 and set(user_input) == VALID_COLOR_CHARS:
+        if len(user_input) == 3 and set(user_input) == set(get_args(VALID_COLOR_CHARS)):
             pick_order_chars = [user_input[0], user_input[1], user_input[2]]
             print(
                 f"\nUser-defined order: Base='{pick_order_chars[0].upper()}', "

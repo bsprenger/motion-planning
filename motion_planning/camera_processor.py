@@ -6,24 +6,21 @@ Sources:
 - https://mujoco.readthedocs.io/en/3.0.1/modeling.html#cameras for coordinate system
 """
 
-from typing import Literal
-
 import cv2
 import numpy as np
 from robosuite.utils.camera_utils import get_real_depth_map
 
 from .simulator import Simulator
+from .utils import VALID_COLOR_CHARS
 
-COLORS = Literal["red", "green", "blue"]
 
-
-def create_color_mask(image: np.ndarray, color: COLORS) -> np.ndarray:
+def create_color_mask(image: np.ndarray, color: VALID_COLOR_CHARS) -> np.ndarray:
     """
     Create a binary mask for a specified color in an image.
 
     Args:
         image: The input RGB image as a NumPy array.
-        color: The color to segment ("red", "green", or "blue").
+        color: The color to segment ("r", "g", or "b").
 
     Returns:
         A binary mask where the specified color is white (255) and all other colors are black (0).
@@ -36,7 +33,7 @@ def create_color_mask(image: np.ndarray, color: COLORS) -> np.ndarray:
     hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
 
     # TODO: parameterize the color ranges
-    if color == "red":
+    if color == "r":
         # Red can span across 0-10 and 170-180 in HSV
         lower_red1 = np.array([0, 70, 50])
         upper_red1 = np.array([10, 255, 255])
@@ -46,18 +43,16 @@ def create_color_mask(image: np.ndarray, color: COLORS) -> np.ndarray:
         upper_red2 = np.array([180, 255, 255])
         mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
         mask = cv2.bitwise_or(mask1, mask2)
-    elif color == "green":
+    elif color == "g":
         lower_green = np.array([36, 50, 50])
         upper_green = np.array([86, 255, 255])
         mask = cv2.inRange(hsv_image, lower_green, upper_green)
-    elif color == "blue":
+    elif color == "b":
         lower_blue = np.array([100, 150, 0])  # Adjusted lower bound for blue
         upper_blue = np.array([140, 255, 255])
         mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
     else:
-        raise ValueError(
-            f"Invalid color: {color}. Valid options are 'red', 'green', 'blue'."
-        )
+        raise ValueError(f"Invalid color: {color}. Valid options are 'r', 'g', 'b'.")
 
     kernel = np.ones((5, 5), np.uint8)  # TODO: parameterize kernel size
 
@@ -83,7 +78,7 @@ class CameraProcessor:
         self.sim = simulator.env.sim
 
     def get_pixel_coords_from_color(
-        self, observation: dict[str, np.ndarray], color: COLORS
+        self, observation: dict[str, np.ndarray], color: VALID_COLOR_CHARS
     ) -> np.ndarray:
         """
         Extract pixel coordinates corresponding to a specific color in the image.
@@ -109,7 +104,7 @@ class CameraProcessor:
         return pixel_coords_2d
 
     def get_world_frame_positions_from_color(
-        self, observation: dict[str, np.ndarray], color: COLORS
+        self, observation: dict[str, np.ndarray], color: VALID_COLOR_CHARS
     ) -> np.ndarray:
         """
         Convert color-detected pixels to 3D world coordinates.
@@ -140,6 +135,22 @@ class CameraProcessor:
         )
 
         return self._camera_to_world_frame(points_in_camera_frame)
+
+    def get_block_position_from_color(
+        self, observation: dict[str, np.ndarray], color: VALID_COLOR_CHARS
+    ) -> np.ndarray:
+        """
+        Get the average position of a block of a specified color in the world frame.
+
+        Args:
+            observation: Dictionary containing camera observations.
+            color: Color of the block to detect.
+
+        Returns:
+            Average 3D position of the detected block in the world frame.
+        """
+        positions = self.get_world_frame_positions_from_color(observation, color)
+        return np.mean(positions, axis=1)
 
     def _unproject_points_to_camera_frame(
         self, pixel_coords_2d: np.ndarray, depth: np.ndarray
