@@ -45,10 +45,13 @@ if __name__ == "__main__":
         # Since we know the block size and we know the stacking is relatively
         # reliable we can just use the base position and add the height of the
         # block times the index of the block we are stacking
+        # This is a bit of a hack, but it works well with the current time
+        # constraints. In the future it would be better to use the camera
+        # to detect positions more robustly and use them for feedback control
         target_pos[2] += OBJECT_HEIGHT * (i + 1)  # Stack height
         print(f"Moving {color.upper()} to {target_pos} from {pick_pos}")
 
-        task_executor.perform_pick_and_place(
+        obs = task_executor.perform_pick_and_place(
             initial_obs=obs,
             pick_location=pick_pos,
             target_location=target_pos,
