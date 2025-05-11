@@ -12,8 +12,8 @@ class TrajectoryController:
         self,
         delta_translation_magnitude: float = 2.0,
         delta_rotation_magnitude: float = 0.1,  # Radians per step
-        position_p_gain: float = 5.0,
-        position_i_gain: float = 0.0,
+        position_p_gain: float = 3.0,
+        position_i_gain: float = 0.1,
         orientation_p_gain: float = 1.0,
         orientation_i_gain: float = 0.0,
         max_integral_pos: float = 0.5,  # Anti-windup limit for position
