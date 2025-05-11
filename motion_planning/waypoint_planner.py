@@ -90,7 +90,7 @@ class WaypointPlanner:
             list[dict]: A list of waypoint dictionaries for the TaskExecutor.
         """
         waypoints = []
-        safe_height = pick_location[2] + height_offset
+        safe_height = current_location[2] + height_offset
 
         # 1. Move directly upwards to a safe height with gripper open
         up_position = np.array([current_location[0], current_location[1], safe_height])
