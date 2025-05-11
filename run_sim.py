@@ -1,23 +1,31 @@
 import numpy as np
 
 from motion_planning.simulator import Simulator
+from motion_planning.task_executor import TaskExecutor
+from motion_planning.trajectory_controller import TrajectoryController
 from motion_planning.utils import get_stacking_order_from_user
 
 if __name__ == "__main__":
     sim = Simulator()
-    sim.reset()
+    obs = sim.reset()
+    sim.render()
 
+    # We start by getting a stacking order from the user
     stack_order = get_stacking_order_from_user()
 
-    # 6DOF position and intrinsics of the camera
-    camera_translation, camera_rotation = sim.get_camera_transform()
-    camera_intrinsics = sim.get_camera_intrinsics()
-    print("Camera Translation:", camera_translation)
-    print("Camera Rotation:", camera_rotation)
-    print("Camera Intrinsics:", camera_intrinsics)
+    # We will need a controller to actually move the robot towards a target pose
+    # The controller is PI-based (for simplicity, D is not used -- performance
+    # is good enough without it)
+    # The controller has all sorts of settings for gains/clip limits etc.,
+    # but the defaults are good for this case
+    ctrl = TrajectoryController()
 
-    # Path to model of the robot arm
-    print("Robot MJCF Path:", sim.get_robot_mjcf_path())
+    # Next, we create a TaskExecutor, which is a wrapper that simplifies the
+    # interface between the simulator and the trajectory controller
+    # Essentially, it just takes a target pose and keeps applying control inputs
+    # until the target pose is reached
+    task_executor = TaskExecutor(simulator=sim, controller=ctrl)
+    obs, _ = task_executor.reset_pose(obs, max_steps=100)
 
     for i in range(1000):
         # Set the desired 6DOF position of the end effector + gripper position
