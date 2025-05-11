@@ -71,7 +71,7 @@ class WaypointPlanner:
         self,
         current_location: np.ndarray,
         pick_location: np.ndarray,
-        safe_height_offset: float = 0.1,
+        height_offset: float = 0.1,
     ) -> list[dict]:
         """
         Generates a sequence of waypoints for a pick operation, ending with gripper closed.
@@ -90,7 +90,7 @@ class WaypointPlanner:
             list[dict]: A list of waypoint dictionaries for the TaskExecutor.
         """
         waypoints = []
-        safe_height = pick_location[2] + safe_height_offset
+        safe_height = pick_location[2] + height_offset
 
         # 1. Move directly upwards to a safe height with gripper open
         up_position = np.array([current_location[0], current_location[1], safe_height])
@@ -130,7 +130,7 @@ class WaypointPlanner:
         self,
         current_location: np.ndarray,
         release_location: np.ndarray,
-        safe_height_offset: float = 0.1,
+        height_offset: float = 0.1,
     ) -> list[dict]:
         """
         Generates a sequence of waypoints for a place operation, ending with gripper open.
@@ -151,7 +151,7 @@ class WaypointPlanner:
         waypoints = []
 
         # Calculate the safe height based on the release location
-        safe_height = release_location[2] + safe_height_offset
+        safe_height = release_location[2] + height_offset
 
         # 1. Move directly upwards to a safe height with gripper closed
         up_position = np.array([current_location[0], current_location[1], safe_height])
