@@ -1,5 +1,6 @@
 import numpy as np
 
+from motion_planning.camera_processor import CameraProcessor
 from motion_planning.simulator import Simulator
 from motion_planning.task_executor import TaskExecutor
 from motion_planning.trajectory_controller import TrajectoryController
@@ -26,6 +27,15 @@ if __name__ == "__main__":
     # until the target pose is reached
     task_executor = TaskExecutor(simulator=sim, controller=ctrl)
     obs, _ = task_executor.reset_pose(obs, max_steps=100)
+
+    # Now, we are ready to start stacking
+    # First we have to get the base position
+    # We use the camera processor to get the positions of each block
+    # but we only get the position when we actually need it (in case something
+    # gets moved in the meantime)
+    camera_processor = CameraProcessor(simulator=sim)
+    base_pos = camera_processor.get_block_position_from_color(obs, stack_order[0])
+    print(f"Base position: {base_pos}")
 
     for i in range(1000):
         # Set the desired 6DOF position of the end effector + gripper position
